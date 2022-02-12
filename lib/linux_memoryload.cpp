@@ -41,6 +41,11 @@ uint64_t memoryLoad::getCurrentMemUsageInKB() {
     return this->getTotalMemoryInKB() - this->currentMemoryUsageInKB;
 }
 
+float memoryLoad::calcMemoryUsageInPercent(uint64_t currentUsedMemory, uint64_t totalMemory) {
+    return round((((currentUsedMemory * 100.0 / totalMemory))) * 100.0) / 100.0;
+}
+
+
 float memoryLoad::getCurrentMemUsageInPercent() {
     this->parseMemoryFile();
     uint64_t memavail = this->getCurrentMemUsageInKB();

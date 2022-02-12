@@ -24,7 +24,12 @@ public:
      * @return const map[pid][cpuload]
      */
     std::map<std::string, double> getProcessCpuLoad();
-
+    /**
+      * @brief get a map of [pid] which contains the cpu load between two calls.
+      *          function needs to be called regularly (e.g.: 5s.) to get the cpu load per process
+      * @return const map[pid][cpuload]
+      */
+    std::map<int, double> getPidCpuLoad();
 
 
 private:
@@ -32,6 +37,7 @@ private:
     void findProcesses();
     void calculateProcessLoad();
     std::map<std::string, double> procCPUUsage;
+    std::map<int, double> pidCPUUsage;
     std::tuple<uint64_t, uint64_t, uint64_t, uint64_t> oldCpuTimes;
     std::tuple<uint64_t, uint64_t, uint64_t, uint64_t> CpuTimes;
     std::map<std::string,std::unordered_map<std::string, std::string>> processStat;

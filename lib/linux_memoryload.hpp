@@ -38,6 +38,11 @@ public:
      */
     float getCurrentMemUsageInPercent();
     /**
+     * @brief get current memory usage of given memory usage in percent 0-100%
+     * @return 0-100%
+     */
+    static float calcMemoryUsageInPercent(uint64_t currentUsedMemory, uint64_t totalMemory);
+    /**
      * @brief get the current memory usage of a process
      * @param pid  - process id
      * @return memory usage in KB

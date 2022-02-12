@@ -75,6 +75,12 @@ std::map<std::string, double> linuxProcessLoad::getProcessCpuLoad() {
     return this->procCPUUsage;
 }
 
+std::map<int, double> linuxProcessLoad::getPidCpuLoad() {
+    this->findProcesses();
+    return this->pidCPUUsage;
+}
+
+
 
 void linuxProcessLoad::calculateProcessLoad() {
     auto [ cpuTotalUserTime, cpuTotalUserLowTime, cpuTotalSysTime, cpuTotalIdleTime] = CpuTimes;
@@ -100,6 +106,7 @@ void linuxProcessLoad::calculateProcessLoad() {
             if(percentage > 0.1) {
                 this->procCPUUsage[procName] = percentage;
             }
+            this->pidCPUUsage[std::stoi(pid)] = percentage;
 
         } catch(...) {
             std::cerr << "process: " << pid  << " disappeared in meantime" << std::endl;

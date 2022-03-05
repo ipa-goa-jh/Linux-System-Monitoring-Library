@@ -125,7 +125,7 @@ class Timer : ITimerSubject {
                          }
                          this->promise.set_value(false);
                      } catch(std::future_error &e) {
-                        std::cout << "future already satisfied" << e.what() << std::endl;
+                        //std::cout << "future already satisfied" << e.what() << std::endl;
                      }
                 });
                 if (this->timerMode == continuous) {

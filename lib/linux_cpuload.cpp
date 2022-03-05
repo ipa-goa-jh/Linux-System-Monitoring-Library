@@ -13,6 +13,7 @@
 #include <cmath>
 #include <sstream>
 #include <chrono>
+#include <thread>
 
 const std::vector<std::string> cpuIdentifiers{"user",
                                         "nice",
@@ -26,17 +27,17 @@ const std::vector<std::string> cpuIdentifiers{"user",
                                         "guest_nice"};
 
 void cpuLoad::initCpuUsage() {
-
-    this->parseStatFile(this->procFile);
+    this->oldCpuLoadMap = this->parseStatFile(this->procFile);
+    std::this_thread::sleep_for(this->updateTime);
+    this->cpuLoadMap = this->parseStatFile(this->procFile);
     this->calculateCpuUsage();
-    this->currentTime = std::chrono::system_clock::now() - std::chrono::milliseconds(2000);
-
+    this->timestamp_of_measurement = std::chrono::system_clock::now() - this->updateTime;
 }
 
 void cpuLoad::upDateCPUUsage() {
-    if (!((this->currentTime + std::chrono::milliseconds(1000)) > std::chrono::system_clock::now())) {
+    if (( std::chrono::system_clock::now() - this->timestamp_of_measurement ) >=  this->updateTime) {
         this->oldCpuLoadMap = this->cpuLoadMap;
-        this->currentTime = std::chrono::system_clock::now();
+        this->timestamp_of_measurement = std::chrono::system_clock::now();
         this->cpuLoadMap = this->parseStatFile(this->procFile);
         this->calculateCpuUsage();
     }
@@ -44,7 +45,6 @@ void cpuLoad::upDateCPUUsage() {
 
 
 double cpuLoad::getCurrentCpuUsage() {
-
     this->upDateCPUUsage();
     return this->cpuUsage.at("cpu");
 }
@@ -64,11 +64,10 @@ std::vector<double> cpuLoad::getCurrentMultiCoreUsage() {
 void cpuLoad::calculateCpuUsage() {
     for (const auto &elem: this->cpuLoadMap) {
 
-        if (this->cpuLoadMap.at(elem.first).at("user") < this->oldCpuLoadMap.at(elem.first).at("user") ||
-            this->cpuLoadMap.at(elem.first).at("nice") < this->oldCpuLoadMap.at(elem.first).at("nice") ||
-            this->cpuLoadMap.at(elem.first).at("system") < this->oldCpuLoadMap.at(elem.first).at("system") ||
-            this->cpuLoadMap.at(elem.first).at("idle") < this->oldCpuLoadMap.at(elem.first).at("idle")) {
-        } else {
+        if (this->cpuLoadMap.at(elem.first).at("user") > this->oldCpuLoadMap.at(elem.first).at("user") ||
+            this->cpuLoadMap.at(elem.first).at("nice") > this->oldCpuLoadMap.at(elem.first).at("nice") ||
+            this->cpuLoadMap.at(elem.first).at("system") > this->oldCpuLoadMap.at(elem.first).at("system") ||
+            this->cpuLoadMap.at(elem.first).at("idle") > this->oldCpuLoadMap.at(elem.first).at("idle")) {
             auto total = (this->cpuLoadMap.at(elem.first).at("user") - this->oldCpuLoadMap.at(elem.first).at("user")) +
                          (this->cpuLoadMap.at(elem.first).at("nice") - this->oldCpuLoadMap.at(elem.first).at("nice")) +
                          (this->cpuLoadMap.at(elem.first).at("system") -
@@ -79,9 +78,7 @@ void cpuLoad::calculateCpuUsage() {
             percent /= total;
             percent *= 100.0;
             this->cpuUsage[elem.first] = percent;
-
         }
-
     }
 }
 

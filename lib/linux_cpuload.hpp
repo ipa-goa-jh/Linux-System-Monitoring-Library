@@ -22,10 +22,10 @@ public:
     /**
      * @brief constructor
      * @param procFileName
+     * @param updateTime - std::chrono obj
      */
-    explicit cpuLoad(std::string procFileName = "/proc/stat"):
-        procFile(std::move(procFileName)), cpuName("") {};
-
+        explicit cpuLoad(std::string procFileName = "/proc/stat", std::chrono::milliseconds updateTime_ = std::chrono::milliseconds(1000)):
+        procFile(std::move(procFileName)), updateTime(updateTime_), cpuName("") {};
     /**
      * @brief initialize the parsing algo
      */
@@ -64,8 +64,9 @@ private:
     void calculateCpuUsage();
     std::map<std::string, std::unordered_map<std::string, uint64_t>> parseStatFile(const std::string& fileName);
     void upDateCPUUsage();
-    std::chrono::system_clock::time_point currentTime;
+    std::chrono::system_clock::time_point timestamp_of_measurement;
     std::string procFile;
+    std::chrono::milliseconds updateTime;
     std::string cpuName;
     std::map<std::string, double> cpuUsage;
     std::map<std::string, std::unordered_map<std::string, uint64_t>> cpuLoadMap;

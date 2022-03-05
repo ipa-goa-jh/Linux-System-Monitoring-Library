@@ -63,6 +63,7 @@ with the flag `USE_THIRDPARTY_EXAMPLES` set to `ON` the examples with thirdparty
     mkdir build
     cd build
     cmake .. -DUSE_THIRDPARTY_EXAMPLES=ON
+    make -C ../thirdparty/uWebSockets/
     cmake --build . --target linuxsystemMonitor
     
 find the executable in the folder `bin` of the `build` folder

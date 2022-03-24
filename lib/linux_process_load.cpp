@@ -12,10 +12,19 @@
 #include <memory>
 #include <iostream>
 #include <algorithm>
-#include <filesystem>
 #include <fstream>
 #include "linux_cpuload.hpp"
 #include "linux_memoryload.hpp"
+
+#if __has_include(<filesystem>)
+  #include <filesystem>
+  namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+  #include <experimental/filesystem> 
+  namespace fs = std::experimental::filesystem;
+#else
+  error "Missing the <filesystem> header."
+#endif
 
 static const std::list<std::string> stats {"pid",
                                     "comm",
@@ -124,9 +133,9 @@ void linuxProcessLoad::findProcesses() {
 
     std::string path{"/proc/"};
     std::vector<std::string> processes;
-    for(auto& elem: std::filesystem::directory_iterator(path)) {
+    for(auto& elem: fs::directory_iterator(path)) {
         auto procPath = elem.path().string();
-        if(elem.exists()) {
+        if(fs::exists(elem)) {
             procPath.erase(procPath.begin(), procPath.begin() + static_cast<int32_t >(path.size()));
             if (std::isdigit(procPath.at(0))) {
                 if (!std::count_if(procPath.begin(), procPath.end(), [](auto c) {

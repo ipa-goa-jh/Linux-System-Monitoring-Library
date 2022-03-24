@@ -17,4 +17,5 @@ target_compile_options(linuxmonitoring PRIVATE ${COMPILER_SETTINGS})
 target_link_libraries(linuxmonitoring
         pthread
         rt
+	stdc++fs
         )
